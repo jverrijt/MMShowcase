@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<magazine>
+  <metadata>
+    <title>MMShowcase magazine</title>
+  </metadata>
+  <chapters>
+    <chapter>
+      <title>New York City</title>
+      <keywords twitterCat="New York City">new+york,new+york+city,#nyc</keywords>
+      <pages>
+        <page>
+          <title></title>
+          <image>page_1.png</image>
+          <overlay type="extraContent">
+            <properties>
+              <xPos>665.0</xPos>
+              <yPos>230.0</yPos>
+            </properties>
+            <items>
+              <item type="youtube" title="24 hours in New York City">http://www.youtube.com/watch?v=r4DQKtYL62Q</item>
+              <item type="link" title="New York">http://www.newyork.com/pages/main</item>
+            </items>
+          </overlay>
+        </page>
+      </pages>
+    </chapter>
+    <chapter>
+      <title>Europe</title>
+      <keywords twitterCat="Europe">venice,schwanstein,#europe</keywords>
+      <pages>
+        <page>
+          <title></title>
+          <image>page_2.png</image>
+        </page>
+        <page>
+          <title></title>
+          <image>page_3.png</image>
+        </page>
+      </pages>
+    </chapter>
+  </chapters>
+</magazine>

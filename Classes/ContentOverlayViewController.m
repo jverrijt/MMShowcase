@@ -181,10 +181,9 @@
 /*
  */
 - (void)dealloc {
-	
-	[super dealloc];
 	[items release];
 	[currentPopOver release];
+  [super dealloc];
 }
 
 @end

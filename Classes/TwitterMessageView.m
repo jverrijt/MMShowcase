@@ -37,28 +37,28 @@
 #pragma mark - 
 #pragma mark UIWebViewDelegate
 
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-	
-	if(navigationType == UIWebViewNavigationTypeLinkClicked) {
-		[[UIApplication sharedApplication] openURL:request.URL];
-		return NO;
-	}
-	
-	return YES;
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
+    if(navigationType == UIWebViewNavigationTypeLinkClicked) {
+        [[UIApplication sharedApplication] openURL:request.URL];
+        return NO;
+    }
+    
+    return YES;
 }
 
 /*
- */
-- (IBAction) openProfilePage { 
-	
-	if(_username != nil) {
-		NSString *twUrl = [@"http://www.twitter.com/" stringByAppendingString:_username];
-		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:twUrl]];
-	}
+*/
+- (IBAction) openProfilePage
+{
+    if(_username != nil) {
+        NSString *twUrl = [@"http://www.twitter.com/" stringByAppendingString:_username];
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:twUrl]];
+    }
 }
 
 /*
- */
+*/
 
 
 @end

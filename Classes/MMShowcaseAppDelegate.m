@@ -39,30 +39,27 @@
 #pragma mark Application lifecycle
 
 /**
- */
+*/
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-	NSString *magazineXml = [[NSBundle mainBundle].resourcePath stringByAppendingString:@"/magazine.xml"];
-	NSString *xml  = [NSString stringWithContentsOfFile:magazineXml encoding:NSUTF8StringEncoding error:nil];
-	
-	MagazineStructure *magazine = [MagazineStructure sharedInstance];
-    
+    NSString *magazineXml = [[NSBundle mainBundle].resourcePath stringByAppendingString:@"/magazine.xml"];
+    NSString *xml  = [NSString stringWithContentsOfFile:magazineXml encoding:NSUTF8StringEncoding error:nil];
+
+    MagazineStructure *magazine = [MagazineStructure sharedInstance];
+
     NSError *err = [magazine loadMagazineStructure:xml];
-    
+
     if(err == nil) {
         NSLog(@"Magazine initialized with %d chapters and %d pages.", magazine.chapters.count, magazine.allPages.count);
         _viewController.pages = magazine.allPages;
-        
+
         [self.window addSubview:_viewController.view];
         [self.window makeKeyAndVisible];
     } else {
         NSLog(@"Error loading magazine: %@", [err localizedDescription]);
     }
-	return YES;
+    
+    return YES;
 }
-
-/*
- */
-
 
 @end

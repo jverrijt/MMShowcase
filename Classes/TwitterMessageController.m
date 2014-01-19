@@ -40,41 +40,41 @@
 @implementation TwitterMessageController
 
 /**
- */
+*/
 - (void) viewDidLoad
 {
-	_usernameView.text = _username;
-	((TwitterMessageView *) self.view).username = _username;
-	
-	// Disable scroll.
-	UIScrollView *sc = ((UIScrollView *)[[_textView valueForKey:@"_internal"] valueForKey:@"scroller"]);
-	if([sc respondsToSelector:@selector(setIndicatorStyle:)] && [sc respondsToSelector:@selector(setScrollEnabled:)]) {
-		sc.scrollEnabled = NO;
-	}
-	
-	_textView.backgroundColor = [UIColor clearColor];
+    _usernameView.text = _username;
+    ((TwitterMessageView *) self.view).username = _username;
+
+    // Disable scroll.
+    UIScrollView *sc = ((UIScrollView *)[[_textView valueForKey:@"_internal"] valueForKey:@"scroller"]);
+    if([sc respondsToSelector:@selector(setIndicatorStyle:)] && [sc respondsToSelector:@selector(setScrollEnabled:)]) {
+        sc.scrollEnabled = NO;
+    }
+
+    _textView.backgroundColor = [UIColor clearColor];
     NSString *fn = [[NSBundle mainBundle] pathForResource:@"twitter_message" ofType:@"html"];
     NSString *c  = [NSString stringWithContentsOfFile:fn encoding:NSUTF8StringEncoding error:nil];
-	NSString *fmt = [NSString stringWithFormat:c, _message];
-	
+    NSString *fmt = [NSString stringWithFormat:c, _message];
+
     [_textView loadHTMLString:fmt baseURL:[NSURL URLWithString:@"/"]];
     _textView.delegate = (TwitterMessageView *) self.view;
     _imageView.layer.cornerRadius = 5.0;
-    
+
     [self loadImageAtUrl:_profilePicUrl];
 }
 
 /**
- */
+*/
 - (void) loadImageAtUrl:(NSString *)url
 {
-	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]
-        cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
-	_conn = [NSURLConnection connectionWithRequest:request delegate:self];
-	
-	if(_conn) {
-		self.receivedData = [NSMutableData data];
-	}
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]
+                                             cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
+    _conn = [NSURLConnection connectionWithRequest:request delegate:self];
+
+    if(_conn) {
+        self.receivedData = [NSMutableData data];
+    }
 }
 
 
@@ -82,26 +82,26 @@
 #pragma mark URLConnection delegate
 
 /**
- */
+*/
 - (void)connection:(NSURLConnection *)conn didReceiveResponse:(NSURLResponse *)response
 {
-	[_receivedData setLength:0];
+    [_receivedData setLength:0];
 }
 
 /**
- */
+*/
 - (void)connection:(NSURLConnection *)conn didReceiveData:(NSData *)data
 {
-	[_receivedData appendData:data];
+    [_receivedData appendData:data];
 }
 
 /**
- */
+*/
 - (void)connectionDidFinishLoading:(NSURLConnection *)conn
 {
-	UIImage *img = [UIImage imageWithData:_receivedData];
-	_imageView.image = img;
-	_receivedData = [NSMutableData data];
+    UIImage *img = [UIImage imageWithData:_receivedData];
+    _imageView.image = img;
+    _receivedData = [NSMutableData data];
 }
 
 @end

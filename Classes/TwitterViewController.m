@@ -41,137 +41,135 @@
 @implementation TwitterViewController
 
 /**
- */
+*/
 - (void) viewDidAppear:(BOOL)animated {
-	
-	[_indicator startAnimating];
-	
-	MagazineStructure *structure = [MagazineStructure sharedInstance];
-    
-	Chapter *chapter = [structure.chapters objectAtIndex:self.selectedPage.chapterIdx];
-	self.keywords = [chapter.twitterKeywords componentsSeparatedByString:@","];
-	_twitterCatLabel.text = [_twitterCatLabel.text stringByAppendingFormat:@" %@", chapter.twitterCat];
-	
-	NSString *keywordStr = [_keywords componentsJoinedByString:@"\"+OR+\""];
+
+    [_indicator startAnimating];
+
+    MagazineStructure *structure = [MagazineStructure sharedInstance];
+
+    Chapter *chapter = [structure.chapters objectAtIndex:self.selectedPage.chapterIdx];
+    self.keywords = [chapter.twitterKeywords componentsSeparatedByString:@","];
+    _twitterCatLabel.text = [_twitterCatLabel.text stringByAppendingFormat:@" %@", chapter.twitterCat];
+
+    NSString *keywordStr = [_keywords componentsJoinedByString:@"\"+OR+\""];
     NSString *url = [NSString stringWithFormat:@"https://api.twitter.com/1.1/search/tweets.json?rpp=15&q=%%22%@%%22",
-                     [keywordStr urlEncode]];
-	
-	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]
-        cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
-    
-	_conn = [NSURLConnection connectionWithRequest:request delegate:self];
-    
-	if(_conn) {
-		self.receivedData = [NSMutableData data];
-	}
+             [keywordStr urlEncode]];
+
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]
+                                             cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
+
+    _conn = [NSURLConnection connectionWithRequest:request delegate:self];
+
+    if(_conn) {
+        self.receivedData = [NSMutableData data];
+    }
 }
 
 #pragma mark -
 #pragma mark URLConnection delegate
 
 /**
- */
+*/
 - (void)connection:(NSURLConnection *)conn didReceiveResponse:(NSURLResponse *)response
 {
-	[_receivedData setLength:0];
+    [_receivedData setLength:0];
 }
 
 /**
- */
+*/
 - (void)connection:(NSURLConnection *)conn didReceiveData:(NSData *)data
 {
-	[_receivedData appendData:data];
+    [_receivedData appendData:data];
 }
 
 /**
- */
+*/
 - (void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-	UIAlertView *vw = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not connect to Twitter. Try again later."
-        delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-	[_indicator stopAnimating];
-	[vw show];
+    UIAlertView *vw = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not connect to Twitter. Try again later."
+                                                delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+    [_indicator stopAnimating];
+    [vw show];
 }
 
 /**
- */
+*/
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse
 {
     return nil;
 }
 
 /*
- */
+*/
 - (void)connectionDidFinishLoading:(NSURLConnection *)conn
 {
-	NSString *json = [[NSString alloc] initWithData:_receivedData encoding:NSUTF8StringEncoding];
+    NSString *json = [[NSString alloc] initWithData:_receivedData encoding:NSUTF8StringEncoding];
     NSLog(@"%@", json);
-	
-	NSDictionary *dict = [json JSONValue];
-	NSArray *results = [[dict valueForKeyPath:@"results"] allObjects];
-	
-	float xPos = 10.0;
-	for(NSDictionary *result in results) {
-		TwitterMessageController *controller = [TwitterMessageController new];
-		
-		controller.username = [[[result objectForKey:@"from_user"] urlDecode] stringByDecodingHTMLEntities];
-		controller.message = [[[result objectForKey:@"text"] urlDecode] stringByDecodingHTMLEntities];
-		controller.profilePicUrl = [result objectForKey:@"profile_image_url"];
-		
-		// Don't include empty messages.
-		if(controller.message == nil || [controller.message isEqualToString:@""]) {
-			continue;
+
+    NSDictionary *dict = [json JSONValue];
+    NSArray *results = [[dict valueForKeyPath:@"results"] allObjects];
+
+    float xPos = 10.0;
+    for(NSDictionary *result in results) {
+        TwitterMessageController *controller = [TwitterMessageController new];
+
+        controller.username = [[[result objectForKey:@"from_user"] urlDecode] stringByDecodingHTMLEntities];
+        controller.message = [[[result objectForKey:@"text"] urlDecode] stringByDecodingHTMLEntities];
+        controller.profilePicUrl = [result objectForKey:@"profile_image_url"];
+
+        // Don't include empty messages.
+        if(controller.message == nil || [controller.message isEqualToString:@""]) {
+            continue;
         }
-		
-		UIView *msgView = controller.view;
-		msgView.frame = CGRectMake(xPos, 10.0, 300.0, 135.0);
-		msgView.alpha = 0.75;
-		
-		msgView.layer.cornerRadius = 8.0f;
-		msgView.clipsToBounds = NO;
-		
+
+        UIView *msgView = controller.view;
+        msgView.frame = CGRectMake(xPos, 10.0, 300.0, 135.0);
+        msgView.alpha = 0.75;
+
+        msgView.layer.cornerRadius = 8.0f;
+        msgView.clipsToBounds = NO;
+
         // Draw a drop shadow.
         msgView.layer.masksToBounds = NO;
         msgView.layer.shadowOffset = CGSizeMake(-5, 10);
         msgView.layer.shadowRadius = 5;
         msgView.layer.shadowOpacity = 0.4;
         msgView.layer.shadowPath = [UIBezierPath bezierPathWithRect:msgView.bounds].CGPath;
-        
-		[_scrollView addSubview:msgView];
-		
-		xPos += msgView.frame.size.width + 10.0;
-	}
-	
-	[UIView beginAnimations:nil context:nil];
-	[UIView setAnimationDuration:1.0];
-	_indicator.alpha = 0.0;
-	
-	if(results.count == 0) {
-		_noTweetsLabel.alpha = 1.0;
-	}
-	
-	[UIView commitAnimations];
-	
-	[_scrollView setContentSize:CGSizeMake(xPos, 155.0)];
-	self.receivedData = [NSMutableData data];
+
+        [_scrollView addSubview:msgView];
+
+        xPos += msgView.frame.size.width + 10.0;
+    }
+
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:1.0];
+    _indicator.alpha = 0.0;
+
+    if(results.count == 0) {
+        _noTweetsLabel.alpha = 1.0;
+    }
+
+    [UIView commitAnimations];
+
+    [_scrollView setContentSize:CGSizeMake(xPos, 155.0)];
+    self.receivedData = [NSMutableData data];
 }
 
 /**
- */
+*/
 - (void) cleanUp
 {
-	_scrollView.delegate = nil;
+    _scrollView.delegate = nil;
 }
 
-/*
+/**
  Opens twitter profile.
- 
- TODO: make configurable.
- */
+*/
 - (IBAction) openTwitterPage
 {
     // TODO make configurable. Replace with your own url
-	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.twitter.com/username/"]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.twitter.com/username/"]];
 }
 
 @end

@@ -36,20 +36,22 @@
 
 #define CODE_CHARS "'\"/.,&"
 
-/*
- Returns encoded representation of this String
- */
-- (id) urlEncode {
-	NSString *encoded = (NSString *) CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef) self, NULL, CFSTR(CODE_CHARS), kCFStringEncodingUTF8));
-	return encoded;
+/**
+Returns encoded representation of this String
+*/
+- (id) urlEncode
+{
+    NSString *encoded = (NSString *) CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef) self, NULL, CFSTR(CODE_CHARS), kCFStringEncodingUTF8));
+    return encoded;
 }
 
-/*
- Returns normal string from urlencoded.
- */
-- (id) urlDecode { 
-	NSString *decoded = (NSString *) CFBridgingRelease(CFURLCreateStringByReplacingPercentEscapesUsingEncoding(NULL, (CFStringRef) self, CFSTR(""), kCFStringEncodingUTF8));
-	return decoded;
+/**
+Returns normal string from urlencoded.
+*/
+- (id) urlDecode
+{
+    NSString *decoded = (NSString *) CFBridgingRelease(CFURLCreateStringByReplacingPercentEscapesUsingEncoding(NULL, (CFStringRef) self, CFSTR(""), kCFStringEncodingUTF8));
+    return decoded;
 }
 
 @end

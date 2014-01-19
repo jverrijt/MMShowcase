@@ -38,64 +38,64 @@
 @implementation WebbrowserViewController
 
 /**
- */
+*/
 - (void) viewDidLoad
 {
-	_webview.allowsInlineMediaPlayback = YES;
-	_webview.delegate = self;
-    
-	_loadingIndicator.alpha = 0.0;
-	_loadingIndicator.layer.cornerRadius = 10.0;
-    
+    _webview.allowsInlineMediaPlayback = YES;
+    _webview.delegate = self;
+
+    _loadingIndicator.alpha = 0.0;
+    _loadingIndicator.layer.cornerRadius = 10.0;
+
     _webview.scalesPageToFit = YES;
 }
 
 
 /**
- FIXME Rotation is hardcoded to either portrait or landscape.
- */
+  FIXME Rotation is hardcoded to either portrait or landscape.
+  */
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-	if(UIInterfaceOrientationIsLandscape(interfaceOrientation))
-		return YES;
-	
-	return NO;
+    if(UIInterfaceOrientationIsLandscape(interfaceOrientation))
+        return YES;
+
+    return NO;
 }
 
 /**
- */
+*/
 - (void) viewWillAppear:(BOOL)animated
 {
-	_bar.topItem.title = _barTitle;
+    _bar.topItem.title = _barTitle;
 }
 
 /**
- */
+*/
 - (void) viewContentItem
 {
-	[self loadRequestInWebview:self.item.item];
+    [self loadRequestInWebview:self.item.item];
 }
 
 /**
- */
+*/
 - (void) loadRequestInWebview:(NSString *)url
 {    
-	_url = url;
-	NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
-	[_webview loadRequest:req];
+    _url = url;
+    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
+    [_webview loadRequest:req];
 }
 
 /**
- */
+*/
 - (IBAction) close
 {
-	[_webview stopLoading];
-	[_webview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
-	
-	_webview.delegate = nil;
-	_webview = nil;
-	
-	[self dismissViewControllerAnimated:YES completion:nil];
+    [_webview stopLoading];
+    [_webview loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
+
+    _webview.delegate = nil;
+    _webview = nil;
+
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 
@@ -103,7 +103,7 @@
 #pragma mark UI_webview delegate method.
 
 /**
- */
+*/
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse
 {
     return nil;
@@ -111,34 +111,34 @@
 
 
 /**
- */
+*/
 - (void)_webviewDidStartLoad:(UIWebView *)webview
 {
-	[UIView beginAnimations:nil context:nil];
-	[UIView setAnimationDuration:1.0];
-	
-	_loadingIndicator.alpha = 0.70;
-	
-	[UIView commitAnimations];
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:1.0];
+
+    _loadingIndicator.alpha = 0.70;
+
+    [UIView commitAnimations];
 }
 
 /**
- */
+*/
 - (void)_webviewDidFinishLoad:(UIWebView *)webview
 {
-	[UIView beginAnimations:nil context:nil];
-	[UIView setAnimationDuration:1.0];
-	
-	_loadingIndicator.alpha = 0.0;
-	
-	[UIView commitAnimations];
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:1.0];
+
+    _loadingIndicator.alpha = 0.0;
+
+    [UIView commitAnimations];
 }
 
 /**
- */
+*/
 - (IBAction) openInExternal
 {
-	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:_url]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:_url]];
 }
 
 @end

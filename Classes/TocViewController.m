@@ -49,92 +49,92 @@
 @implementation TocViewController
 
 /*
- Draws the table of contents.
- */
+   Draws the table of contents.
+   */
 - (void) viewDidLoad {
-	
-	_scrollView.delegate = self;
-    
-	MagazineStructure *structure = [MagazineStructure sharedInstance];
+
+    _scrollView.delegate = self;
+
+    MagazineStructure *structure = [MagazineStructure sharedInstance];
     NSArray *chapters = structure.chapters;
-	
-	float thumbXpos = 0.0;
-	int chapterIdx = 0;
-	int pageIdx = 0;
-    
-	for(Chapter *chapter in chapters) {
-		NSArray *pages =  chapter.pages;
-		
-		UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(thumbXpos - 40.0, 65.0, 128.0, 25.0)];
-		
-		l.backgroundColor = [UIColor clearColor];
-		l.textColor = [UIColor whiteColor];
-		l.textAlignment = NSTextAlignmentCenter;
-		l.text = chapter.title;
-		l.font = [UIFont fontWithName:@"helvetica" size:17.0];
-		
-		l.shadowColor = [UIColor blackColor];
-		l.shadowOffset = CGSizeMake(1.0, 1.0);
-		
-		l.transform = CGAffineTransformMakeRotation(degreesToRadians(270.0));
-		
-		[_scrollView addSubview:l];
-        
-		if([l.text isEqualToString:@""]) {
-			thumbXpos += 10.0;
-		} else {
-			thumbXpos += 60.0;
-		}
-        
+
+    float thumbXpos = 0.0;
+    int chapterIdx = 0;
+    int pageIdx = 0;
+
+    for(Chapter *chapter in chapters) {
+        NSArray *pages =  chapter.pages;
+
+        UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(thumbXpos - 40.0, 65.0, 128.0, 25.0)];
+
+        l.backgroundColor = [UIColor clearColor];
+        l.textColor = [UIColor whiteColor];
+        l.textAlignment = NSTextAlignmentCenter;
+        l.text = chapter.title;
+        l.font = [UIFont fontWithName:@"helvetica" size:17.0];
+
+        l.shadowColor = [UIColor blackColor];
+        l.shadowOffset = CGSizeMake(1.0, 1.0);
+
+        l.transform = CGAffineTransformMakeRotation(degreesToRadians(270.0));
+
+        [_scrollView addSubview:l];
+
+        if([l.text isEqualToString:@""]) {
+            thumbXpos += 10.0;
+        } else {
+            thumbXpos += 60.0;
+        }
+
         // Pages
-		for(Page *page in pages) {
-			// Load thumbnail.
-			NSString *thumbName = [@"thumb_" stringByAppendingString:page.image];
-            
-			PageSelectButton *pageButton = [PageSelectButton buttonWithType:UIButtonTypeCustom];
-			[pageButton addTarget:self action:@selector(selectPage:) forControlEvents:UIControlEventTouchUpInside];
-            
-			pageButton.frame = CGRectMake(thumbXpos, 15.0, 170.0, 128.0);
-			
-			pageButton.thumbURI = thumbName;
-			pageButton.backgroundColor = [UIColor darkGrayColor];
-            
-			pageButton.highlighted = NO;
-			pageButton.chapterIdx = chapterIdx;
-			pageButton.pageIdx = pageIdx;
-            
-			[_scrollView addSubview:pageButton];
-            
+        for(Page *page in pages) {
+            // Load thumbnail.
+            NSString *thumbName = [@"thumb_" stringByAppendingString:page.image];
+
+            PageSelectButton *pageButton = [PageSelectButton buttonWithType:UIButtonTypeCustom];
+            [pageButton addTarget:self action:@selector(selectPage:) forControlEvents:UIControlEventTouchUpInside];
+
+            pageButton.frame = CGRectMake(thumbXpos, 15.0, 170.0, 128.0);
+
+            pageButton.thumbURI = thumbName;
+            pageButton.backgroundColor = [UIColor darkGrayColor];
+
+            pageButton.highlighted = NO;
+            pageButton.chapterIdx = chapterIdx;
+            pageButton.pageIdx = pageIdx;
+
+            [_scrollView addSubview:pageButton];
+
             pageButton.layer.masksToBounds = NO;
             pageButton.layer.shadowOffset = CGSizeMake(-5, 10);
             pageButton.layer.shadowRadius = 5;
             pageButton.layer.shadowOpacity = 0.4;
-            
+
             pageButton.layer.shadowPath = [UIBezierPath bezierPathWithRect:pageButton.bounds].CGPath;
-			
-			// [pageButton addSubview:shade];
-			thumbXpos += pageButton.frame.size.width + 10.0;
-			
-			pageIdx++;
-		}
-		
-		chapterIdx++;
-	}
-	// Height 10px higher as content.
-	[_scrollView setContentSize:CGSizeMake(thumbXpos, 140.0)];
+
+            // [pageButton addSubview:shade];
+            thumbXpos += pageButton.frame.size.width + 10.0;
+
+            pageIdx++;
+        }
+
+        chapterIdx++;
+    }
+    // Height 10px higher as content.
+    [_scrollView setContentSize:CGSizeMake(thumbXpos, 140.0)];
 }
 
 /*
- Find the button that is active, highlight it and scroll to it.
- */
+   Find the button that is active, highlight it and scroll to it.
+   */
 - (void) viewDidAppear:(BOOL)animated
 {
-	if(self.selectedPage != nil) {
+    if(self.selectedPage != nil) {
         MagazineStructure *structure = [MagazineStructure sharedInstance];
         int pIdx = [structure.allPages indexOfObject:self.selectedPage];
-        
+
         PageSelectButton *button = nil;
-        
+
         for(UIView *vw in _scrollView.subviews) {
             if([vw isKindOfClass:PageSelectButton.class]) {
                 PageSelectButton *b = (PageSelectButton *) vw;
@@ -145,97 +145,97 @@
         if(button != nil) {
             [self highlightPageButton:button animated:NO];
         }
-	}
+    }
 }
 
 /*
- Highlights the selected TOC item and scrolls to it.
- */
+   Highlights the selected TOC item and scrolls to it.
+   */
 - (void) highlightPageButton:(PageSelectButton *)button animated:(BOOL)animated
 {
-	if(_selectedButton != nil) {
-		_selectedButton.layer.borderWidth = 0.0;
+    if(_selectedButton != nil) {
+        _selectedButton.layer.borderWidth = 0.0;
     }
-    
-	_selectedButton = button;
-	
-	_selectedButton.layer.borderWidth = 2.0;
+
+    _selectedButton = button;
+
+    _selectedButton.layer.borderWidth = 2.0;
     UIColor *p = [UIColor whiteColor];
-	_selectedButton.layer.borderColor = p.CGColor;
-    
-	CGRect scrollFrame = button.frame;
-	
-	if(scrollFrame.origin.x > _scrollView.contentSize.width - 1024.0) {
-		// FIXME
-		// scrollFrame.origin.x = scrollView.contentSize.width - 512.0;
-	}
-	else if(scrollFrame.origin.x > _scrollView.contentOffset.x + 512.0) {
-		scrollFrame.origin.x += _scrollView.frame.size.width / 2  - (button.frame.size.width / 2);
-	}
-	else {
-		scrollFrame.origin.x -= _scrollView.frame.size.width / 2  - (button.frame.size.width / 2);
-	}
-	
-	[_scrollView scrollRectToVisible:scrollFrame animated:animated];
-	
-	if(_scrollView.contentOffset.x == 0.0) {
-		[self scrollViewDidScroll:_scrollView];
-	}
+    _selectedButton.layer.borderColor = p.CGColor;
+
+    CGRect scrollFrame = button.frame;
+
+    if(scrollFrame.origin.x > _scrollView.contentSize.width - 1024.0) {
+        // FIXME
+        // scrollFrame.origin.x = scrollView.contentSize.width - 512.0;
+    }
+    else if(scrollFrame.origin.x > _scrollView.contentOffset.x + 512.0) {
+        scrollFrame.origin.x += _scrollView.frame.size.width / 2  - (button.frame.size.width / 2);
+    }
+    else {
+        scrollFrame.origin.x -= _scrollView.frame.size.width / 2  - (button.frame.size.width / 2);
+    }
+
+    [_scrollView scrollRectToVisible:scrollFrame animated:animated];
+
+    if(_scrollView.contentOffset.x == 0.0) {
+        [self scrollViewDidScroll:_scrollView];
+    }
 }
 
 /*
- */
+*/
 - (void) selectPage:(PageSelectButton *)button {
-	
-	if([self.delegate isAnimating]) {
-		return;
+
+    if([self.delegate isAnimating]) {
+        return;
     }
-	
-	if(button == _selectedButton) {
-		return;
+
+    if(button == _selectedButton) {
+        return;
     }
-	
-	[self highlightPageButton:button animated:YES];
-	MagazineStructure *structure = [MagazineStructure sharedInstance];
-	Page *page = [structure.allPages objectAtIndex:button.pageIdx];
-	
-	[self.delegate browseToPage:page animated:YES];
+
+    [self highlightPageButton:button animated:YES];
+    MagazineStructure *structure = [MagazineStructure sharedInstance];
+    Page *page = [structure.allPages objectAtIndex:button.pageIdx];
+
+    [self.delegate browseToPage:page animated:YES];
 }
 
 #pragma mark -
 #pragma mark Scrollview delegate
 
 /*
- Only load the buttons that are currently visible.
- */
+   Only load the buttons that are currently visible.
+   */
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-	
-	float xOffset = scrollView.contentOffset.x;
-	
-	// Which buttons to load?
-	for(UIView *sv in [scrollView subviews]) {
-		if([sv isKindOfClass:PageSelectButton.class]) {
-			
-			PageSelectButton *pageButton = (PageSelectButton *) sv;
-			
-			if(pageButton.frame.origin.x > (xOffset - 170.0)
-               && pageButton.frame.origin.x < xOffset + (_scrollView.frame.size.width + 170.0)) {
-				
-				UIImage *pageThumbImage = [UIImage imageNamed:pageButton.thumbURI];
-				[pageButton setImage:pageThumbImage forState:UIControlStateNormal];
-                
-			} else {
-				[pageButton setImage:nil forState:UIControlStateNormal];
-			}
-		}
-	}
+
+    float xOffset = scrollView.contentOffset.x;
+
+    // Which buttons to load?
+    for(UIView *sv in [scrollView subviews]) {
+        if([sv isKindOfClass:PageSelectButton.class]) {
+
+            PageSelectButton *pageButton = (PageSelectButton *) sv;
+
+            if(pageButton.frame.origin.x > (xOffset - 170.0)
+                    && pageButton.frame.origin.x < xOffset + (_scrollView.frame.size.width + 170.0)) {
+
+                UIImage *pageThumbImage = [UIImage imageNamed:pageButton.thumbURI];
+                [pageButton setImage:pageThumbImage forState:UIControlStateNormal];
+
+            } else {
+                [pageButton setImage:nil forState:UIControlStateNormal];
+            }
+        }
+    }
 }
 
 /**
- */
+*/
 - (void) cleanUp {
-	
-	_scrollView.delegate = nil;
+
+    _scrollView.delegate = nil;
 }
 
 @end

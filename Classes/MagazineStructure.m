@@ -62,25 +62,24 @@
 @implementation MagazineStructure
 
 /**
- */
+*/
 + (MagazineStructure *) sharedInstance
 {
     static MagazineStructure *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedInstance = [[MagazineStructure alloc] init];
-        
-    });
+            sharedInstance = [[MagazineStructure alloc] init];
+            });
     return sharedInstance;
 }
 
 /**
- */
+*/
 - (NSError *) loadMagazineStructure:(NSString *)xml;
 {
-	NSError *err = nil;
+    NSError *err = nil;
     self.doc = [[CXMLDocument alloc] initWithXMLString:xml options:0 error:&err];
-    
+
     if(err == nil) {
         [self parseMagazine];
     }
@@ -88,122 +87,119 @@
 }
 
 /**
- Parse magazine structure.
- */
+  Parse magazine structure.
+  */
 - (NSArray *) parseMagazine
 {
-	CXMLElement *rootEl = [_doc rootElement];
-	
-	self.allPages = [NSMutableArray array];
-	self.chapters = [NSMutableArray array];
-	
-	NSArray *chapterNodes = [rootEl nodesForXPath:@"//chapter" error:nil];
-	
-	for(int i = 0; i < chapterNodes.count; i++) {
-		
+    CXMLElement *rootEl = [_doc rootElement];
+
+    self.allPages = [NSMutableArray array];
+    self.chapters = [NSMutableArray array];
+
+    NSArray *chapterNodes = [rootEl nodesForXPath:@"//chapter" error:nil];
+
+    for(int i = 0; i < chapterNodes.count; i++) {
+
         Chapter *chapter = [Chapter new];
-		CXMLNode *chapterNode = [chapterNodes objectAtIndex:i];
-		// Assign the values from the XML to the chapter
-		chapter.title = [chapterNode nodeForXPath:@"title" error:nil].stringValue;
-        
-		// Keywords for Twitter.
-		CXMLElement *keywordNode = (CXMLElement *) [chapterNode nodeForXPath:@"keywords" error:nil];
-		chapter.twitterKeywords = keywordNode.stringValue;
-		chapter.twitterCat = [keywordNode attributeForName:@"twitterCat"].stringValue;
-		
-		// Get the chapter pages.
-		NSArray *pageNodes = [chapterNode nodesForXPath:@"pages/page" error:nil];
-		NSMutableArray *pages = [NSMutableArray array];
-		
-		for(CXMLNode *pageNode in pageNodes) {
-			
+        CXMLNode *chapterNode = [chapterNodes objectAtIndex:i];
+        // Assign the values from the XML to the chapter
+        chapter.title = [chapterNode nodeForXPath:@"title" error:nil].stringValue;
+
+        // Keywords for Twitter.
+        CXMLElement *keywordNode = (CXMLElement *) [chapterNode nodeForXPath:@"keywords" error:nil];
+        chapter.twitterKeywords = keywordNode.stringValue;
+        chapter.twitterCat = [keywordNode attributeForName:@"twitterCat"].stringValue;
+
+        // Get the chapter pages.
+        NSArray *pageNodes = [chapterNode nodesForXPath:@"pages/page" error:nil];
+        NSMutableArray *pages = [NSMutableArray array];
+
+        for(CXMLNode *pageNode in pageNodes) {
+
             Page *page = [Page new];
-            
+
             page.title = [pageNode nodeForXPath:@"title" error:nil].stringValue;
             page.image = [pageNode nodeForXPath:@"image" error:nil].stringValue;
             page.chapterIdx = i;
-            
-			CXMLElement *overlayNode = (CXMLElement *) [pageNode nodeForXPath:@"overlay" error:nil];
-			
-			// Overlay configured. parse it.
-			if(overlayNode != nil) {
+
+            CXMLElement *overlayNode = (CXMLElement *) [pageNode nodeForXPath:@"overlay" error:nil];
+
+            // Overlay configured. parse it.
+            if(overlayNode != nil) {
                 page.overlay = [self parseOverlayProperties:overlayNode];
             }
-			
-			[pages addObject:page];
-		}
-		
-		[_allPages addObjectsFromArray:pages];
-		
+
+            [pages addObject:page];
+        }
+
+        [_allPages addObjectsFromArray:pages];
+
         chapter.pages = pages;
-		[_chapters addObject:chapter];
-	}
-	
-	// don't need it any longer
-	
-	self.doc = nil;
-	
-	return _chapters;
+        [_chapters addObject:chapter];
+    }
+
+    _doc = nil;
+    return _chapters;
 }
 
 /*
- Returns page after given page.
- */
-- (Page *) pageAfter:(Page *)page {
-    
+   Returns page after given page.
+   */
+- (Page *) pageAfter:(Page *)page 
+{
     int pIdx = [_allPages indexOfObject:page];
-    
+
     if(pIdx + 1 < _allPages.count) {
         return [_allPages objectAtIndex:pIdx + 1];
     }
-    
+
     return nil;
 }
 
 /*
- Returns page before given page.
- */
+   Returns page before given page.
+   */
 - (Page *) pageBefore:(Page *)page
 {
     int pIdx = [_allPages indexOfObject:page];
-    
+
     if(pIdx - 1 >= 0) {
         return [_allPages objectAtIndex:pIdx - 1];
     }
     return nil;
 }
 
-/*
- */
+/**
+*/
 - (Overlay *) parseOverlayProperties:(CXMLElement *)overlayNode
 {
     NSError *err = nil;
-    
+
     Overlay *overlay = [Overlay new];
     overlay.overlayType = [overlayNode attributeForName:@"type"].stringValue;
-	overlay.xPos = [[[overlayNode nodeForXPath:@"properties/xPos" error:&err] stringValue] doubleValue];
+    overlay.xPos = [[[overlayNode nodeForXPath:@"properties/xPos" error:&err] stringValue] doubleValue];
     overlay.yPos = [[[overlayNode nodeForXPath:@"properties/yPos" error:&err] stringValue] doubleValue];
-	
-	NSArray *itemNodes = [overlayNode nodesForXPath:@"items/item" error:&err];
-	
-	if(err != nil) {
-		NSLog(@"Unable to parse overlay properties for %@", overlayNode);
-		return nil;
-	}
-	
-	NSMutableArray *items = [NSMutableArray array];
-	
-	for(CXMLElement *itemNode in itemNodes) {
-		ContentItem *item = [ContentItem new];
+
+    NSArray *itemNodes = [overlayNode nodesForXPath:@"items/item" error:&err];
+
+    if(err != nil) {
+        NSLog(@"Unable to parse overlay properties for %@", overlayNode);
+        return nil;
+    }
+
+    NSMutableArray *items = [NSMutableArray array];
+
+    for(CXMLElement *itemNode in itemNodes) {
+        ContentItem *item = [ContentItem new];
         item.type = kExtraContentItemTypeLink;
-        
-		item.item = itemNode.stringValue;
-		item.title = [itemNode attributeForName:@"title"].stringValue;
-		
-		[items addObject:item];
-	}
+
+        item.item = itemNode.stringValue;
+        item.title = [itemNode attributeForName:@"title"].stringValue;
+
+        [items addObject:item];
+    }
     overlay.items = items;
-	return overlay;
+    return overlay;
 }
 
 @end

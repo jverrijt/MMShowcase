@@ -32,22 +32,21 @@
  */
 @interface TwitterMessageController : UIViewController {
 	
-	IBOutlet UIImageView *imageView;	
-	IBOutlet UILabel *usernameView;
-	IBOutlet UIWebView *textView;
+	IBOutlet UIImageView *_imageView;
+	IBOutlet UILabel *_usernameView;
 	
-	NSMutableData *receivedData;
-	NSDictionary *flickrData;
+	NSMutableData *_receivedData;
+	NSDictionary *_flickrData;
 }
 
-@property (nonatomic, retain) NSString *username; 
-@property (nonatomic, retain) NSString *message; 
-@property (nonatomic, retain) NSString *profilePicUrl; 
+@property (nonatomic, strong) NSString *username; 
+@property (nonatomic, strong) NSString *message; 
+@property (nonatomic, strong) NSString *profilePicUrl; 
 
-@property (nonatomic, retain) NSData *receivedData;
-@property (nonatomic, retain) NSURLConnection *conn;
+@property (nonatomic, strong) NSData *receivedData;
+@property (nonatomic, strong) NSURLConnection *conn;
 
-@property (readonly) IBOutlet UIWebView *textView;
+@property IBOutlet UIWebView *textView;
 
 - (void) loadImageAtUrl:(NSString *)url;
 

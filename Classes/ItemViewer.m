@@ -34,8 +34,6 @@
 
 @implementation ItemViewer
 
-@synthesize item;
-
 - (void) viewContentItem {
 	// Implement in sub.
 }
@@ -52,11 +50,6 @@
 
 /*
 */
-- (void)dealloc {
-
-	[super dealloc];
-	[item release];
-}
 
 
 @end

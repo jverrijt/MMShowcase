@@ -35,7 +35,7 @@
 @interface OverlayViewController : UIViewController {}
 
 @property (retain) Overlay *overlay;
-@property (assign) UIViewController *delegate;
+@property (retain) UIViewController *delegate;
 
 - (void) loadOverlay:(Overlay *)overlay;
 

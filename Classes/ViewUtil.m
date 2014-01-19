@@ -35,8 +35,8 @@
 
 @implementation ViewUtil
 
-+ (UIImage *) createImageForUIView:(UIView *)view { 
-	
++ (UIImage *) createImageForUIView:(UIView *)view
+{	
 	UIImage *image = nil;
 	
 	UIGraphicsBeginImageContext(view.frame.size);

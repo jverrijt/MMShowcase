@@ -40,16 +40,16 @@
  Returns encoded representation of this String
  */
 - (id) urlEncode {
-	NSString *encoded = (NSString *) CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef) self, NULL, CFSTR(CODE_CHARS), kCFStringEncodingUTF8);
-	return [encoded autorelease];
+	NSString *encoded = (NSString *) CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef) self, NULL, CFSTR(CODE_CHARS), kCFStringEncodingUTF8));
+	return encoded;
 }
 
 /*
  Returns normal string from urlencoded.
  */
 - (id) urlDecode { 
-	NSString *decoded = (NSString *) CFURLCreateStringByReplacingPercentEscapesUsingEncoding(NULL, (CFStringRef) self, CFSTR(""), kCFStringEncodingUTF8);
-	return [decoded autorelease];
+	NSString *decoded = (NSString *) CFBridgingRelease(CFURLCreateStringByReplacingPercentEscapesUsingEncoding(NULL, (CFStringRef) self, CFSTR(""), kCFStringEncodingUTF8));
+	return decoded;
 }
 
 @end

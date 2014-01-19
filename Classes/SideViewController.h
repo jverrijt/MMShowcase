@@ -35,8 +35,8 @@
 
 @interface SideViewController : UIViewController {}
 
-@property (assign) id<PageControllerDelegate> delegate;
-@property (retain) Page *selectedPage;
+@property (unsafe_unretained) id<PageControllerDelegate> delegate;
+@property (strong) Page *selectedPage;
 
 - (void) cleanUp;
 

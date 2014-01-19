@@ -34,15 +34,6 @@
 
 @implementation SideViewController
 
-@synthesize delegate, selectedPage;
-
-/*
-*/
-- (void)dealloc {
-	[selectedPage release];
-	[super dealloc];
-}
-
 /*
  */
 - (void) cleanUp {

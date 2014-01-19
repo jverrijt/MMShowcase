@@ -34,18 +34,11 @@
 
 @implementation OverlayViewController
 
-@synthesize overlay, delegate;
-
-/*
+/**
  */
-- (void) loadOverlay:(Overlay *) overlay {
+- (void) loadOverlay:(Overlay *) overlay
+{
   // Implemented by subclass
-}
-
-- (void)dealloc {
-
-  [overlay release];
-  [super dealloc];
 }
 
 @end

@@ -34,9 +34,5 @@
 
 @implementation TOCUIImage
 
-- (void) dealloc {	
-	[super dealloc];
-
-}
 
 @end

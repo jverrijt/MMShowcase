@@ -37,7 +37,7 @@
 */
 @interface PageSelectButton : UIButton {}
 
-@property (retain) NSString *thumbURI;
+@property (strong) NSString *thumbURI;
 @property int chapterIdx;
 @property int pageIdx;
 
@@ -46,10 +46,12 @@
 /*
 */
 @interface TocViewController : SideViewController <UIScrollViewDelegate> {		
-	IBOutlet UIScrollView *scrollView;
+	IBOutlet UIScrollView *_scrollView;
 }
 
-@property (retain) UIButton *selectedButton;
+@property (strong) UIButton *selectedButton;
+
+@property Page *selectedPage;
 
 - (void) highlightPageButton:(PageSelectButton *)button animated:(BOOL)animated;
 

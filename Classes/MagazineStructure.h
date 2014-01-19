@@ -37,10 +37,10 @@
 */
 @interface Chapter : NSObject {}
 
-@property (retain) NSString *title;
-@property (retain) NSString *twitterCat;
-@property (retain) NSString *twitterKeywords;
-@property (retain) NSArray *pages;
+@property (strong) NSString *title;
+@property (strong) NSString *twitterCat;
+@property (strong) NSString *twitterKeywords;
+@property (strong) NSArray *pages;
 
 @end
 
@@ -48,8 +48,8 @@
  */
 @interface Overlay : NSObject {}
 
-@property (retain) NSString *overlayType;
-@property (retain) NSArray *items;
+@property (strong) NSString *overlayType;
+@property (strong) NSArray *items;
 @property double xPos; 
 @property double yPos;
 
@@ -59,9 +59,9 @@
 */
 @interface Page : NSObject {}
 
-@property (retain) NSString *title; 
-@property (retain) NSString *image;
-@property (retain) Overlay *overlay; 
+@property (strong) NSString *title; 
+@property (strong) NSString *image;
+@property (strong) Overlay *overlay; 
 @property int chapterIdx;
 
 @end
@@ -78,8 +78,8 @@ typedef enum {
 @interface ContentItem : NSObject {}
 
 @property kExtraContentItemType type;
-@property (retain) NSString *item;
-@property (retain) NSString *title;
+@property (strong) NSString *item;
+@property (strong) NSString *title;
 
 @end
 
@@ -89,15 +89,13 @@ typedef enum {
 	id sharedInstance;
 }
 
-@property (nonatomic, retain) CXMLDocument *doc;
-@property (nonatomic, retain) NSMutableArray *chapters;
-@property (nonatomic, retain) NSMutableArray *allPages;
-@property (nonatomic, retain) Page *selectedPage;
+@property (nonatomic, strong) CXMLDocument *doc;
+@property (nonatomic, strong) NSMutableArray *chapters;
+@property (nonatomic, strong) NSMutableArray *allPages;
+@property (nonatomic, strong) Page *selectedPage;
 
-+ (MagazineStructure *)sharedInstance;
-+ (MagazineStructure *) magazineStructureWithXML:(NSString *)xml;
-
-- (id) initMagazineStructureWithXML:(NSString *)xml;
++ (MagazineStructure *) sharedInstance;
+- (NSError *) loadMagazineStructure:(NSString *)xml;
 
 - (Page *) pageAfter:(Page *)page;
 - (Page *) pageBefore:(Page *)page;

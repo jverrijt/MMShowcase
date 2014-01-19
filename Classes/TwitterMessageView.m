@@ -34,8 +34,6 @@
 
 @implementation TwitterMessageView
 
-@synthesize username;
-
 #pragma mark - 
 #pragma mark UIWebViewDelegate
 
@@ -53,19 +51,14 @@
  */
 - (IBAction) openProfilePage { 
 	
-	if(username != nil) {
-		NSString *twUrl = [@"http://www.twitter.com/" stringByAppendingString:username];
+	if(_username != nil) {
+		NSString *twUrl = [@"http://www.twitter.com/" stringByAppendingString:_username];
 		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:twUrl]];
 	}
 }
 
 /*
  */
-- (void) dealloc {
-	
-	[username release];
-	[super dealloc];
-}
 
 
 @end

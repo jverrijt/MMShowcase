@@ -32,7 +32,7 @@
  */
 @interface TwitterMessageView : UIView <UIWebViewDelegate> {}
 
-@property (nonatomic, retain) NSString *username;
+@property (nonatomic, strong) NSString *username;
 
 - (IBAction) openProfilePage;
 

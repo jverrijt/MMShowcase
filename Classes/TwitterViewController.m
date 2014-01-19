@@ -1,22 +1,22 @@
 /*
  * Copyright (c) 2011 Metamotifs - Joost Verrijt <joost at metamotifs.nl>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  * Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
- * 
+ *
  * Redistributions in binary form must reproduce the above copyright
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
- * 
+ *
  * Neither the name of the project's author nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -40,85 +40,88 @@
 
 @implementation TwitterViewController
 
-@synthesize keywords, conn, receivedData;
-
-/*
+/**
  */
 - (void) viewDidAppear:(BOOL)animated {
 	
-	[indicator startAnimating];	
+	[_indicator startAnimating];
 	
-	MagazineStructure *structure = [MagazineStructure sharedInstance];	
-  
+	MagazineStructure *structure = [MagazineStructure sharedInstance];
+    
 	Chapter *chapter = [structure.chapters objectAtIndex:self.selectedPage.chapterIdx];
 	self.keywords = [chapter.twitterKeywords componentsSeparatedByString:@","];
-	twitterCatLabel.text = [twitterCatLabel.text stringByAppendingFormat:@" %@", chapter.twitterCat];
+	_twitterCatLabel.text = [_twitterCatLabel.text stringByAppendingFormat:@" %@", chapter.twitterCat];
 	
-	NSString *keywordStr = [keywords componentsJoinedByString:@"\"+OR+\""];
-	NSString *url = [NSString stringWithFormat:@"http://search.twitter.com/search.json?rpp=15&q=%%22%@%%22", [keywordStr urlEncode]];
+	NSString *keywordStr = [_keywords componentsJoinedByString:@"\"+OR+\""];
+    NSString *url = [NSString stringWithFormat:@"https://api.twitter.com/1.1/search/tweets.json?rpp=15&q=%%22%@%%22",
+                     [keywordStr urlEncode]];
 	
-	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
-	self.conn = [NSURLConnection connectionWithRequest:request delegate:self];
-
-	if(conn) {
+	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]
+        cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
+    
+	_conn = [NSURLConnection connectionWithRequest:request delegate:self];
+    
+	if(_conn) {
 		self.receivedData = [NSMutableData data];
-	}	
+	}
 }
 
-#pragma mark - 
+#pragma mark -
 #pragma mark URLConnection delegate
 
-- (void)connection:(NSURLConnection *)conn didReceiveResponse:(NSURLResponse *)response {
-	
-	[receivedData setLength:0]; 
-}
-
-- (void)connection:(NSURLConnection *)conn didReceiveData:(NSData *)data {
-	
-	[receivedData appendData:data];
-}
-
-/*
+/**
  */
-- (void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-	
-	UIAlertView *vw = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not connect to Twitter. Try again later." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-	
-	[indicator stopAnimating];
-	
+- (void)connection:(NSURLConnection *)conn didReceiveResponse:(NSURLResponse *)response
+{
+	[_receivedData setLength:0];
+}
+
+/**
+ */
+- (void)connection:(NSURLConnection *)conn didReceiveData:(NSData *)data
+{
+	[_receivedData appendData:data];
+}
+
+/**
+ */
+- (void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+{
+	UIAlertView *vw = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not connect to Twitter. Try again later."
+        delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+	[_indicator stopAnimating];
 	[vw show];
-	[vw release];	
+}
+
+/**
+ */
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse
+{
+    return nil;
 }
 
 /*
  */
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
-  return nil;
-}
-
-/*
-*/
-- (void)connectionDidFinishLoading:(NSURLConnection *)_conn {
-	
-	NSString *json = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
+- (void)connectionDidFinishLoading:(NSURLConnection *)conn
+{
+	NSString *json = [[NSString alloc] initWithData:_receivedData encoding:NSUTF8StringEncoding];
+    NSLog(@"%@", json);
 	
 	NSDictionary *dict = [json JSONValue];
 	NSArray *results = [[dict valueForKeyPath:@"results"] allObjects];
 	
-	[json release];
-
-	float xPos = 10.0;	
+	float xPos = 10.0;
 	for(NSDictionary *result in results) {
-		
-		TwitterMessageController *controller = [[TwitterMessageController new] autorelease];
+		TwitterMessageController *controller = [TwitterMessageController new];
 		
 		controller.username = [[[result objectForKey:@"from_user"] urlDecode] stringByDecodingHTMLEntities];
 		controller.message = [[[result objectForKey:@"text"] urlDecode] stringByDecodingHTMLEntities];
 		controller.profilePicUrl = [result objectForKey:@"profile_image_url"];
 		
 		// Don't include empty messages.
-		if(controller.message == nil || [controller.message isEqualToString:@""])
+		if(controller.message == nil || [controller.message isEqualToString:@""]) {
 			continue;
+        }
 		
 		UIView *msgView = controller.view;
 		msgView.frame = CGRectMake(xPos, 10.0, 300.0, 135.0);
@@ -127,61 +130,48 @@
 		msgView.layer.cornerRadius = 8.0f;
 		msgView.clipsToBounds = NO;
 		
-    // Draw a drop shadow.
-    msgView.layer.masksToBounds = NO;
-    msgView.layer.shadowOffset = CGSizeMake(-5, 10);
-    msgView.layer.shadowRadius = 5;
-    msgView.layer.shadowOpacity = 0.4;
-    msgView.layer.shadowPath = [UIBezierPath bezierPathWithRect:msgView.bounds].CGPath;
-    
-		[scrollView addSubview:msgView];
+        // Draw a drop shadow.
+        msgView.layer.masksToBounds = NO;
+        msgView.layer.shadowOffset = CGSizeMake(-5, 10);
+        msgView.layer.shadowRadius = 5;
+        msgView.layer.shadowOpacity = 0.4;
+        msgView.layer.shadowPath = [UIBezierPath bezierPathWithRect:msgView.bounds].CGPath;
+        
+		[_scrollView addSubview:msgView];
 		
 		xPos += msgView.frame.size.width + 10.0;
-	}	
+	}
 	
-  
-  // FIXME : rewrite to block.
 	[UIView beginAnimations:nil context:nil];
 	[UIView setAnimationDuration:1.0];
-	indicator.alpha = 0.0;
+	_indicator.alpha = 0.0;
 	
 	if(results.count == 0) {
-		noTweetsLabel.alpha = 1.0;
+		_noTweetsLabel.alpha = 1.0;
 	}
 	
 	[UIView commitAnimations];
 	
-	[scrollView setContentSize:CGSizeMake(xPos, 155.0)];
+	[_scrollView setContentSize:CGSizeMake(xPos, 155.0)];
 	self.receivedData = [NSMutableData data];
 }
 
-/*
+/**
  */
-- (void) cleanUp {
-	scrollView.delegate = nil;	
+- (void) cleanUp
+{
+	_scrollView.delegate = nil;
 }
 
 /*
-Opens twitter profile. 
-
-TODO: make configurable.
+ Opens twitter profile.
+ 
+ TODO: make configurable.
  */
-- (IBAction) openTwitterPage {
-	
-  // TODO make configurable. Replace with your own url
+- (IBAction) openTwitterPage
+{
+    // TODO make configurable. Replace with your own url
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.twitter.com/username/"]];
 }
-
-/*
- */
-- (void)dealloc {
-	[conn release];
-	[receivedData release];
-	[keywords release];
-	[scrollView release];
-	
-	[super dealloc];
-}
-
 
 @end

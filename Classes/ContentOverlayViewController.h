@@ -35,11 +35,11 @@
 #import "Const.h"
 
 @interface ContentOverlayViewController : OverlayViewController <UITableViewDataSource, UITableViewDelegate> {
-	IBOutlet UIButton *extraContentButton;
+	IBOutlet UIButton *_extraContentButton;
 }
 
-@property (retain) NSArray *items;
-@property (retain) UIPopoverController *currentPopOver;
+@property (strong) NSArray *items;
+@property (strong) UIPopoverController *currentPopOver;
 
 - (IBAction) showContentList;
 

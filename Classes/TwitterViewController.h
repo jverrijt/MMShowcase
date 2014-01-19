@@ -34,15 +34,15 @@
 
 @interface TwitterViewController : SideViewController {
 	
-	IBOutlet UIScrollView *scrollView;
-	IBOutlet UIActivityIndicatorView *indicator;
-	IBOutlet UILabel *twitterCatLabel;
-	IBOutlet UILabel *noTweetsLabel;
+	IBOutlet UIScrollView *_scrollView;
+	IBOutlet UIActivityIndicatorView *_indicator;
+	IBOutlet UILabel *_twitterCatLabel;
+	IBOutlet UILabel *_noTweetsLabel;
 }
 
-@property (nonatomic, retain) NSMutableData *receivedData;
-@property (nonatomic, retain) NSArray *keywords; 
-@property (nonatomic, retain) NSURLConnection *conn;
+@property (nonatomic, strong) NSMutableData *receivedData;
+@property (nonatomic, strong) NSArray *keywords; 
+@property (nonatomic, strong) NSURLConnection *conn;
 
 
 - (IBAction) openTwitterPage;

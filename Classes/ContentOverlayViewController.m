@@ -1,22 +1,22 @@
 /*
  * Copyright (c) 2011 Metamotifs
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  * Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
- * 
+ *
  * Redistributions in binary form must reproduce the above copyright
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
- * 
+ *
  * Neither the name of the project's author nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -33,71 +33,70 @@
 #import "ContentOverlayViewController.h"
 #import "TouchXML.h"
 #import "MagazineStructure.h"
-
 #import <QuartzCore/QuartzCore.h>
 
 @implementation ContentOverlayViewController
 
-@synthesize items, currentPopOver;
-
-/*
+/**
  */
-- (void) loadOverlay:(Overlay *)overlay {
-	
+- (void) loadOverlay:(Overlay *)overlay
+{
 	self.overlay = overlay;
-  
-	CGRect buttonFrame = extraContentButton.frame;
+    
+	CGRect buttonFrame = _extraContentButton.frame;
 	
 	buttonFrame.origin.x = overlay.xPos;
 	buttonFrame.origin.y = overlay.yPos;
-
-  // Position the button that will show the item list.
-	extraContentButton.frame = buttonFrame;
+    
+    // Position the button that will show the item list.
+	_extraContentButton.frame = buttonFrame;
 }
 
-/*
+/**
  */
-- (IBAction) showContentList { 
-	
-	UITableViewController *controller = [[[UITableViewController alloc] initWithStyle:UITableViewStylePlain] autorelease];
+- (IBAction) showContentList
+{
+	UITableViewController *controller = [[UITableViewController alloc] initWithStyle:UITableViewStylePlain];
 	
 	controller.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	controller.tableView.dataSource = self;
 	controller.tableView.delegate = self;
 	
-	UIImageView *bgView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"app_bg_wide.png"]] autorelease]; 
+	UIImageView *bgView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"app_bg_wide.png"]];
 	bgView.autoresizesSubviews = NO;
 	bgView.contentMode = UIViewContentModeTopLeft;
-  
+    
 	controller.tableView.backgroundView = bgView;
-	controller.contentSizeForViewInPopover = CGSizeMake(300.0, self.overlay.items.count * 44.0);
+	controller.preferredContentSize = CGSizeMake(300.0, self.overlay.items.count * 44.0);
 	
 	UIPopoverController *popOver = [[UIPopoverController alloc] initWithContentViewController:controller];
-	self.currentPopOver = [popOver autorelease];
+	_currentPopOver = popOver;
 	
-	[popOver presentPopoverFromRect:extraContentButton.frame inView:self.view 
-         permittedArrowDirections:(UIPopoverArrowDirectionLeft | UIPopoverArrowDirectionRight) animated:YES];
+	[_currentPopOver presentPopoverFromRect:_extraContentButton.frame inView:self.view
+           permittedArrowDirections:(UIPopoverArrowDirectionLeft | UIPopoverArrowDirectionRight) animated:YES];
 }
 
-#pragma mark - 
+#pragma mark -
 #pragma mark TableView delegate
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-	return 1; 
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+	return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
 	return self.overlay.items.count;
 }
 
-/*
+/**
  */
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-	
-	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"extraContentCell"];	
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"extraContentCell"];
 	
 	if(cell == nil) {
-		cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"extraContentCell"] autorelease];	
+		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"extraContentCell"];
 		cell.textLabel.textColor = [UIColor whiteColor];
 		cell.textLabel.shadowColor = [UIColor blackColor];
 		cell.textLabel.shadowOffset = CGSizeMake(1, 1);
@@ -110,42 +109,41 @@
 	cell.backgroundColor = [UIColor clearColor];
 	
 	switch(item.type) {
-			
-		default: 
-      cell.imageView.image = [UIImage imageNamed:@"71-compass.png"];
+		default:
+            cell.imageView.image = [UIImage imageNamed:@"71-compass.png"];
 			break;
 	}
-  
-	// cell.imageView 
+    
+	// cell.imageView
 	return cell;
 }
 
-/*
+/**
  */
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	
-	if(currentPopOver != nil) {
-		[currentPopOver dismissPopoverAnimated:YES];
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	if(_currentPopOver != nil) {
+		[_currentPopOver dismissPopoverAnimated:YES];
 	}
 	
-	ContentItem *item = [self.overlay.items objectAtIndex:indexPath.row];	
+	ContentItem *item = [self.overlay.items objectAtIndex:indexPath.row];
 	[tableView cellForRowAtIndexPath:indexPath].selected = NO;
 	
-  // Based on item type, show the correct viewer.
-  WebbrowserViewController *viewer = [[WebbrowserViewController alloc] init];	  
-  viewer.type = item.type;
-  viewer.barTitle = item.title;	
+    // Based on item type, show the correct viewer.
+    WebbrowserViewController *viewer = [[WebbrowserViewController alloc] init];
+    viewer.type = item.type;
+    viewer.barTitle = item.title;
 	viewer.item = item;
 	
 	viewer.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-	viewer.modalPresentationStyle = UIModalPresentationFormSheet;
+	viewer.modalPresentationStyle = UIModalPresentationPageSheet;
 	
-	[self.delegate presentModalViewController:viewer animated:YES];
-  viewer.view.superview.frame = CGRectMake(120.0, 100.0, 800.0, 600.0);
-  
+	[self.delegate presentViewController:viewer animated:YES completion:nil];
+    
+    viewer.view.superview.frame = CGRectMake(0.0, 0.0, 780.0, 700.0);
+    
 	// Load the item. POST
 	[viewer viewContentItem];
-	[viewer release];
 }
 
 
@@ -158,32 +156,24 @@
  }
  
  - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
- NSLog(@"touchesBegan");
- 
- for(UITouch *touch in [touches allObjects]) {
- 
- CGPoint point = [touch locationInView:self.view];
- 
- NSLog(@"x: %f, y: %f", point.x, point.y);
- 
- CGRect buttonFrame = extraContentButton.frame;
- 
- buttonFrame.origin.x = point.x - 20.0;
- buttonFrame.origin.y = point.y;
- 
- extraContentButton.frame = buttonFrame;	
- }
- 
- [self touchesCancelled:touches withEvent:event];
+     NSLog(@"touchesBegan");
+     
+     for(UITouch *touch in [touches allObjects]) {
+     
+     CGPoint point = [touch locationInView:self.view];
+     
+     NSLog(@"x: %f, y: %f", point.x, point.y);
+     
+     CGRect buttonFrame = extraContentButton.frame;
+     
+     buttonFrame.origin.x = point.x - 20.0;
+     buttonFrame.origin.y = point.y;
+     
+     extraContentButton.frame = buttonFrame;
+     }
+     
+     [self touchesCancelled:touches withEvent:event];
  }
  */
-
-/*
- */
-- (void)dealloc {
-	[items release];
-	[currentPopOver release];
-  [super dealloc];
-}
 
 @end

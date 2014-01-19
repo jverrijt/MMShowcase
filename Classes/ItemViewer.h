@@ -33,10 +33,9 @@
 #import "MagazineStructure.h"
 
 @interface ItemViewer : UIViewController {
-  ContentItem *item;
 }
 
-@property (nonatomic, retain) ContentItem *item;
+@property (nonatomic, strong) ContentItem *item;
 
 - (void) viewContentItem; 
 

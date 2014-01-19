@@ -69,7 +69,7 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[MagazineStructure alloc] init];
-
+        
     });
     return sharedInstance;
 }
